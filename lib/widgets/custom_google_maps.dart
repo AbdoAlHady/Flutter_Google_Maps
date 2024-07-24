@@ -19,21 +19,27 @@ class _CustomGoogleMapsState extends State<CustomGoogleMaps> {
   @override
   void initState() {
     initialCameraPosition = const CameraPosition(
-        target: LatLng(31.418644602574364, 31.81437468209204), zoom: 15);
-    initMarkers();
-    initPolyliens(); 
+        target: LatLng(31.418644602574364, 31.81437468209204), zoom: 12);
+    // initMarkers();
+    // initPolyliens();
+    // initPolygon();
+    initCircle();
 
     super.initState();
   }
 
   Set<Marker> markers = {};
   Set<Polyline> polylines = {};
+  Set<Polygon> polygons = {};
+  Set<Circle> circles = {};
 
   @override
   Widget build(BuildContext context) {
     return GoogleMap(
       polylines: polylines,
+      polygons: polygons,
       zoomControlsEnabled: false,
+      circles: circles,
       markers: markers,
       onMapCreated: (controller) {
         googleMapController = controller;
@@ -83,16 +89,13 @@ class _CustomGoogleMapsState extends State<CustomGoogleMaps> {
       width: 5,
       startCap: Cap.roundCap,
       color: Colors.red,
-            patterns: [PatternItem.dot],
-  
+      patterns: [PatternItem.dot],
       zIndex: 2,
       points: [
         LatLng(31.403850098063895, 31.792834567369113),
         LatLng(31.408481297231642, 31.796273682794133),
         LatLng(31.40169749107413, 31.80001849736805),
         LatLng(31.393206925193066, 31.80972715051236),
-        
-
       ],
     );
 
@@ -105,14 +108,36 @@ class _CustomGoogleMapsState extends State<CustomGoogleMaps> {
       points: [
         LatLng(31.39871116531892, 31.783282792951155),
         LatLng(31.41237098972474, 31.814582067904848),
-     
-        
-
       ],
     );
 
     polylines.add(polyline);
     polylines.add(polyline2);
+  }
+
+  void initPolygon() {
+    Polygon polygon = Polygon(
+        polygonId: const PolygonId('1'),
+        fillColor: Colors.black.withOpacity(0.5),
+        strokeWidth: 3,
+        points: const [
+          LatLng(31.44549803112866, 31.715613184933257),
+          LatLng(31.47815083004072, 31.747713859572805),
+          LatLng(31.458091939181017, 31.75990181625412),
+          LatLng(31.42792230701503, 31.751662070892106),
+        ]);
+    polygons.add(polygon);
+  }
+
+  void initCircle() {
+    Circle carStation = Circle(
+      circleId: CircleId('1'),
+      fillColor: Colors.black.withOpacity(0.5),
+      radius: 5000,
+      center: LatLng(31.428319766693185, 31.64538763039289),
+    );
+
+    circles.add(carStation);
   }
 }
 
