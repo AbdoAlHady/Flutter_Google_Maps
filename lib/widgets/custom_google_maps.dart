@@ -134,7 +134,7 @@ class _CustomGoogleMapsState extends State<CustomGoogleMaps> {
       circleId: CircleId('1'),
       fillColor: Colors.black.withOpacity(0.5),
       radius: 5000,
-      center: LatLng(31.428319766693185, 31.64538763039289),
+      center: const LatLng(31.428319766693185, 31.64538763039289),
     );
 
     circles.add(carStation);
