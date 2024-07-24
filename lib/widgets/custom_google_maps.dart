@@ -21,15 +21,19 @@ class _CustomGoogleMapsState extends State<CustomGoogleMaps> {
     initialCameraPosition = const CameraPosition(
         target: LatLng(31.418644602574364, 31.81437468209204), zoom: 15);
     initMarkers();
+    initPolyliens(); 
 
     super.initState();
   }
 
   Set<Marker> markers = {};
+  Set<Polyline> polylines = {};
 
   @override
   Widget build(BuildContext context) {
     return GoogleMap(
+      polylines: polylines,
+      zoomControlsEnabled: false,
       markers: markers,
       onMapCreated: (controller) {
         googleMapController = controller;
@@ -71,6 +75,44 @@ class _CustomGoogleMapsState extends State<CustomGoogleMaps> {
 
     markers.addAll(myMarkers);
     setState(() {});
+  }
+
+  void initPolyliens() {
+    Polyline polyline = const Polyline(
+      polylineId: PolylineId('1'),
+      width: 5,
+      startCap: Cap.roundCap,
+      color: Colors.red,
+            patterns: [PatternItem.dot],
+  
+      zIndex: 2,
+      points: [
+        LatLng(31.403850098063895, 31.792834567369113),
+        LatLng(31.408481297231642, 31.796273682794133),
+        LatLng(31.40169749107413, 31.80001849736805),
+        LatLng(31.393206925193066, 31.80972715051236),
+        
+
+      ],
+    );
+
+    Polyline polyline2 = const Polyline(
+      polylineId: PolylineId('1'),
+      width: 5,
+      startCap: Cap.roundCap,
+      color: Colors.black,
+      zIndex: 1,
+      points: [
+        LatLng(31.39871116531892, 31.783282792951155),
+        LatLng(31.41237098972474, 31.814582067904848),
+     
+        
+
+      ],
+    );
+
+    polylines.add(polyline);
+    polylines.add(polyline2);
   }
 }
 
