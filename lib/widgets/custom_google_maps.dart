@@ -3,8 +3,10 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_google_maps/models/place_model.dart';
+import 'package:flutter_google_maps/service/location_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:ui' as ui;
+import 'package:location_platform_interface/location_platform_interface.dart';
 
 class CustomGoogleMaps extends StatefulWidget {
   const CustomGoogleMaps({super.key});
@@ -15,23 +17,26 @@ class CustomGoogleMaps extends StatefulWidget {
 
 class _CustomGoogleMapsState extends State<CustomGoogleMaps> {
   late CameraPosition initialCameraPosition;
-  late GoogleMapController googleMapController;
-  @override
-  void initState() {
-    initialCameraPosition = const CameraPosition(
-        target: LatLng(31.418644602574364, 31.81437468209204), zoom: 12);
-    // initMarkers();
-    // initPolyliens();
-    // initPolygon();
-    initCircle();
-
-    super.initState();
-  }
-
+  GoogleMapController? googleMapController;
   Set<Marker> markers = {};
   Set<Polyline> polylines = {};
   Set<Polygon> polygons = {};
   Set<Circle> circles = {};
+  bool isFirstCall = true;
+  late LocationService locationService;
+  @override
+  void initState() {
+    initialCameraPosition = const CameraPosition(
+        target: LatLng(31.418644602574364, 31.81437468209204), zoom: 1);
+    // initMarkers();
+    // initPolyliens();
+    // initPolygon();
+    // initCircle();
+    locationService = LocationService();
+    updateMyLocation();
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +58,7 @@ class _CustomGoogleMapsState extends State<CustomGoogleMaps> {
     // Load Json File
     var nightMapStyle = await DefaultAssetBundle.of(context)
         .loadString('assets/map_styles/night_map_style.json');
-    googleMapController.setMapStyle(nightMapStyle);
+    googleMapController!.setMapStyle(nightMapStyle);
   }
 
   Future<Uint8List> getImageFormRawData(String image, double width) async {
@@ -138,6 +143,46 @@ class _CustomGoogleMapsState extends State<CustomGoogleMaps> {
     );
 
     circles.add(carStation);
+  }
+
+  void updateMyLocation() async {
+    await locationService.checkAndRequestLocationService();
+    var hasPremission =
+        await locationService.checkAndRequestLocationPermission();
+    if (hasPremission) {
+      locationService.getRealTimeLocationData(
+        (locationData) {
+          _setMyCameraPosition(locationData);
+          _addMarkerToMyLocation(locationData);
+        },
+      );
+    }
+  }
+
+  void _addMarkerToMyLocation(LocationData locationData) {
+    var myLocationMarker = Marker(
+      markerId: const MarkerId('My_Location_Marker'),
+      position: LatLng(locationData.latitude!, locationData.longitude!),
+    );
+    markers.add(myLocationMarker);
+    setState(() {});
+  }
+
+  void _setMyCameraPosition(LocationData locationData) {
+    if (isFirstCall) {
+      var cameraPosition = CameraPosition(
+        target: LatLng(locationData.latitude!, locationData.longitude!),
+        zoom: 17,
+      );
+      googleMapController?.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+      isFirstCall = false;
+    } else {
+      googleMapController?.animateCamera(
+        CameraUpdate.newLatLng(
+          LatLng(locationData.latitude!, locationData.longitude!),
+        ),
+      );
+    }
   }
 }
 
